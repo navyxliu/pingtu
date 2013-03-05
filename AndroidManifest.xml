@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cn.cq.puzzles.bleach"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <!-- for load ads -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- for umeng -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Additional required permission for push notification. Apply only for push notification ad. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+
+    <!-- leadbolt -->
+    <supports-screens
+        android:anyDensity="false"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+
+        <!-- for umeng -->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="50c48ffc52701505fa00004e" >
+        </meta-data>
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="bleach" />
+        <meta-data
+            android:name="com.airpush.android.APPID"
+            android:value="78663" />
+        <meta-data
+            android:name="com.airpush.android.APIKEY"
+            android:value="apikey*1351399916121552306" />
+
+        <activity
+            android:name=".Puzzles"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name=".WelAct" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- leadbolt push -->
+        <receiver android:name="com.pad.android.xappad.AdNotification" />
+        <receiver android:name="com.pad.android.xappad.AdReminderNotification" />
+        <receiver android:name="cn.leadbolt.BootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- airpush -->
+        <!-- This activity is required for all ads. -->
+        <activity
+            android:name="com.airpush.android.OptinActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent" />
+        <!-- End of the required declaration -->
+        <!-- Start declaration for push notification ads. -->
+        <service
+            android:name="com.airpush.android.PushService"
+            android:exported="false" />
+
+        <receiver
+            android:name="com.airpush.android.BootReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+        <!-- End declaration for push notification ads. -->
+        <!-- Add this activity for Smart wall ads.. -->
+        <activity
+            android:name="com.airpush.android.SmartWallActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:launchMode="singleTask" />
+
+        <!-- End of Airpush Manifest declaration -->
+
+    </application>
+
+    <uses-sdk android:minSdkVersion="5" />
+
+</manifest>

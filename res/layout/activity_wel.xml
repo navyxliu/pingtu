@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/logo_header"
+        android:layout_width="180px"
+        android:layout_height="66px"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginBottom="35px"
+        android:layout_marginTop="10px"
+        android:scaleType="fitXY"
+        android:src="@drawable/logo" />
+
+    <ImageButton
+        android:id="@+id/startButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo_header"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:background="#00000000"
+        android:src="@drawable/start" >
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/rateButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/startButton"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:background="#00000000"
+        android:src="@drawable/rate" >
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/getButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rateButton"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:background="#00000000"
+        android:src="@drawable/getmore" >
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/exitButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/getButton"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:background="#00000000"
+        android:src="@drawable/exit" >
+    </ImageButton>
+
+</RelativeLayout>
