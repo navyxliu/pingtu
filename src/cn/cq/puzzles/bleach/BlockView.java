@@ -37,7 +37,9 @@ public class BlockView extends View {
 
 	private int last_x, last_y;
 
-	private boolean isSelected = false;
+	private int last_x2, last_y2;
+
+	private int  isSelected = 0;
 
 	private float _width;
 
@@ -277,14 +279,27 @@ public class BlockView extends View {
 						gridRows[row_col_count + 2],
 						gridRows[row_col_count + 3], paint);
 			}
-			if (isSelected) {
+
+			switch (isSelected) {
+			case 1: {
 			    Paint pt = new Paint(paint);
 
 			    pt.setColor(HIGHLIGHT_COLOR);
 			    pt.setStrokeWidth(3);
 			    highlightBlock(canvas, pt, last_x, last_y);
+			    break;
 			}
+			case 2: {
+			    Paint pt = new Paint(paint);
 
+			    pt.setColor(HIGHLIGHT_COLOR);
+			    pt.setStrokeWidth(3);
+
+			    highlightBlock(canvas, pt, last_x, last_y);
+			    highlightBlock(canvas, pt, last_x2, last_y2);
+			    break;
+			}
+			}
 		}
 		paint.setColor(c);
 		super.onDraw(canvas);
@@ -292,12 +307,22 @@ public class BlockView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		if (isSelected == 2 && event.getAction() == MotionEvent.ACTION_UP) {
+		    isSelected = 0; 
+
+		    copyPic(last_x, last_y, 0, ROWS);
+		    copyPic(last_x2, last_y2, last_x, last_y);
+		    copyPic(0, ROWS, last_x2, last_y2);
+
+		    mRedrawHandler.sleep(50);
+		    return true;
+		}
 		if (event.getAction() != MotionEvent.ACTION_DOWN) {
-			return true;
+		    return true;
 		}
 
 		if (isEvent)
-            return true;
+		    return true;
 
 		int k = (int) ((event.getX() - xOffset) / blockWidth);
 		int l = (int) ((event.getY() - yOffset) / blockHeight);
@@ -307,17 +332,14 @@ public class BlockView extends View {
 		if (l >= COLS)
 			l = COLS - 1;
 
-		if (!isSelected) {
-		    isSelected = true; 
+		isSelected = (isSelected + 1) % 3;
+		if (isSelected == 1) {
 		    last_x = k;
 		    last_y = l;
 		}
-		else {
-		    copyPic(last_x, last_y, 0, ROWS);
-		    copyPic(k, l, last_x, last_y);
-		    copyPic(0, ROWS, k, l);
-
-		    isSelected = false;
+		else if (isSelected == 2) {
+		    last_x2 = k;
+		    last_y2 = l;
 		}
 
 		/*it's not good to swap by (0, 0) as a temp
@@ -341,6 +363,7 @@ public class BlockView extends View {
 		}
 
 		invalidate();
+
 		return true;
 	}
 
