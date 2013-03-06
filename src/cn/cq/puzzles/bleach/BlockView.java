@@ -21,6 +21,8 @@ public class BlockView extends View {
 
 	private static final int GRID_BG_COLOR = Color.argb(0xff, 0x0, 0x0, 0x0);
 
+	private static final int HIGHLIGHT_COLOR = Color.argb(0xff, 0xff, 0x0, 0x0);
+
 	private int delayMillis = 30;
 
 	private Context context = null;
@@ -32,6 +34,10 @@ public class BlockView extends View {
 	private int[] blocks;
 
 	private boolean isEvent = false;
+
+	private int last_x, last_y;
+
+	private boolean isSelected = false;
 
 	private float _width;
 
@@ -271,6 +277,13 @@ public class BlockView extends View {
 						gridRows[row_col_count + 2],
 						gridRows[row_col_count + 3], paint);
 			}
+			if (isSelected) {
+			    Paint pt = new Paint(paint);
+
+			    pt.setColor(HIGHLIGHT_COLOR);
+			    pt.setStrokeWidth(3);
+			    highlightBlock(canvas, pt, last_x, last_y);
+			}
 
 		}
 		paint.setColor(c);
@@ -284,7 +297,7 @@ public class BlockView extends View {
 		}
 
 		if (isEvent)
-			return true;
+            return true;
 
 		int k = (int) ((event.getX() - xOffset) / blockWidth);
 		int l = (int) ((event.getY() - yOffset) / blockHeight);
@@ -294,11 +307,25 @@ public class BlockView extends View {
 		if (l >= COLS)
 			l = COLS - 1;
 
+		if (!isSelected) {
+		    isSelected = true; 
+		    last_x = k;
+		    last_y = l;
+		}
+		else {
+		    copyPic(last_x, last_y, 0, ROWS);
+		    copyPic(k, l, last_x, last_y);
+		    copyPic(0, ROWS, k, l);
+
+		    isSelected = false;
+		}
+
+		/*it's not good to swap by (0, 0) as a temp
 		// 注意这里的交换，还有记住hight 与 行相关，与y相关。width与x相关，与列相关
 		copyPic(0, 0, 0, ROWS);
 		copyPic(k, l, 0, 0);
 		copyPic(0, ROWS, k, l);
-
+		*/
 		int i1 = blocks[0];
 		// 换算选中图片存储区。
 		blocks[0] = blocks[l * COLS + k];
@@ -350,6 +377,28 @@ public class BlockView extends View {
 			// 建议大家如何出现了内存不足异常，最好return 原始的bitmap对象。.
 
 		}
+	}
+
+	void highlightBlock(Canvas canvas, Paint paint, int col, int row) {
+	    canvas.drawLine(xOffset + col * blockWidth, 
+			    yOffset + row * blockHeight, 
+			    xOffset + (col + 1) * blockWidth, 
+			    yOffset + row * blockHeight, paint); 
+
+	    canvas.drawLine(xOffset + col * blockWidth, 
+			    yOffset + row * blockHeight, 
+			    xOffset + col * blockWidth, 
+			    yOffset + (row + 1) * blockHeight, paint); 
+
+	    canvas.drawLine(xOffset + (col + 1) * blockWidth, 
+			    yOffset + (row + 1) * blockHeight, 
+			    xOffset + col * blockWidth, 
+			    yOffset + (row + 1) * blockHeight, paint); 
+
+	    canvas.drawLine(xOffset + (col + 1) * blockWidth, 
+			    yOffset + (row + 1) * blockHeight, 
+			    xOffset + (col + 1) * blockWidth, 
+			    yOffset + row * blockHeight, paint); 
 	}
 
 	/**
