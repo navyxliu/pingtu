@@ -9,12 +9,13 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
 // import org.loon.framework.game.helper.ImageHelper;
 
 public class BlockView extends View {
@@ -40,6 +41,8 @@ public class BlockView extends View {
 	private int last_x2, last_y2;
 
 	private int  isSelected = 0;
+        
+        private boolean isPreview;
 
 	private float _width;
 
@@ -237,7 +240,6 @@ public class BlockView extends View {
 					* COLS + anotherPicColNum];
 			blocks[anotherPicRowNum * COLS + anotherPicColNum] = indexOfFirstPic;
 		}
-
 	}
 
 	/**
@@ -256,6 +258,18 @@ public class BlockView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		int c = paint.getColor();
+		if (isPreview) {
+		    BitmapDrawable src = (BitmapDrawable) r.getDrawable(c_drawable);
+		    Bitmap bitmap = Bitmap.createBitmap((int) _width, (int) _height
+				+ blockHeight, Bitmap.Config.ARGB_8888);
+		    Canvas cvs = new Canvas();
+		    cvs.setBitmap(bitmap);
+		    src.setBounds(0, 0, (int) _width, (int) _height);
+		    src.draw(cvs);
+
+		    canvas.drawBitmap(bitmap, xOffset, yOffset, null); 
+		}
+		else {
 		// 绘制背景看看
 		canvas.drawBitmap(screen, xOffset, yOffset, null);
 		c = paint.getColor();
@@ -301,6 +315,7 @@ public class BlockView extends View {
 			}
 			}
 		}
+		}
 		paint.setColor(c);
 		super.onDraw(canvas);
 	}
@@ -314,9 +329,24 @@ public class BlockView extends View {
 		    copyPic(last_x2, last_y2, last_x, last_y);
 		    copyPic(0, ROWS, last_x2, last_y2);
 
-		    mRedrawHandler.sleep(50);
+		    int t = blocks[last_y * COLS + last_x];
+		    blocks[last_y * COLS + last_x] = blocks[last_y2 * COLS + last_x2];
+		    blocks[last_y2 * COLS + last_x2] = t;
+
+		    int j1;
+		    for (j1 = 0; j1 < imgsCounts; j1++) {
+			    if (blocks[j1] != j1)
+				    break;
+
+		    }
+		    if (j1 == imgsCounts) {
+			    isEvent = true;
+		    }	
+
+		    mRedrawHandler.refresh();
 		    return true;
 		}
+
 		if (event.getAction() != MotionEvent.ACTION_DOWN) {
 		    return true;
 		}
@@ -340,26 +370,6 @@ public class BlockView extends View {
 		else if (isSelected == 2) {
 		    last_x2 = k;
 		    last_y2 = l;
-		}
-
-		/*it's not good to swap by (0, 0) as a temp
-		// 注意这里的交换，还有记住hight 与 行相关，与y相关。width与x相关，与列相关
-		copyPic(0, 0, 0, ROWS);
-		copyPic(k, l, 0, 0);
-		copyPic(0, ROWS, k, l);
-		*/
-		int i1 = blocks[0];
-		// 换算选中图片存储区。
-		blocks[0] = blocks[l * COLS + k];
-		blocks[l * COLS + k] = i1;
-
-		// 检测是否
-		for (int j1 = 0; j1 < imgsCounts; j1++) {
-			if (blocks[j1] != j1)
-				break;
-			if (j1 == imgsCounts - 1)
-				isEvent = true;
-
 		}
 
 		invalidate();
@@ -446,7 +456,9 @@ public class BlockView extends View {
 			BlockView.this.invalidate(); // 导致重绘
 			BlockView.this.update();
 		}
-
+		public void refresh() {
+			sendMessage(obtainMessage(0));
+		}
 		public void sleep(long delayMillis) {
 			this.removeMessages(0);
 			// 这个消息第一次是即时发送的，以后再延迟
@@ -466,6 +478,17 @@ public class BlockView extends View {
 		if (inited) {
 			update();
 		}
+	}
+
+	public void preview() {
+	    isPreview = true;
+	    mRedrawHandler.refresh();
+	}
+
+	public void reset() {
+	    isPreview = false;
+	    isSelected = 0;
+	    mRedrawHandler.refresh();
 	}
 
 	// 换图

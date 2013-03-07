@@ -11,9 +11,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.MotionEvent;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.pad.android.iappad.AdController;
 import com.umeng.analytics.MobclickAgent;
@@ -38,12 +41,26 @@ public class Puzzles extends Activity {
 
 		// 操作按钮，上一个，下一个
 		final ImageButton lastButton = (ImageButton) findViewById(R.id.lastButton);
+		final ImageButton previewButton = (ImageButton) findViewById(R.id.previewButton);
 		final ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
 
 		// 动作
 		lastButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				showLastPic(draw);
+			}
+		});
+
+		previewButton.setOnTouchListener(new OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent ev) {
+                                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                                    draw.preview();     
+                                }
+                                else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                                    draw.reset();     
+                                }
+
+                                return true; 
 			}
 		});
 

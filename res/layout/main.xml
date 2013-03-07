@@ -17,7 +17,17 @@
         android:background="#00000000"
         android:src="@drawable/last" >
     </ImageButton>
-
+    
+    <ImageButton
+        android:id="@+id/previewButton"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/lastButton"
+        android:layout_marginTop="20px"
+        android:background="#00000000"
+        android:src="@drawable/preview" >
+    </ImageButton>
+    
     <ImageButton
         android:id="@+id/nextButton"
         android:layout_width="120dp"
