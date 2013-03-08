@@ -43,7 +43,10 @@ public class Puzzles extends Activity {
 		final ImageButton lastButton = (ImageButton) findViewById(R.id.lastButton);
 		final ImageButton previewButton = (ImageButton) findViewById(R.id.previewButton);
 		final ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
-
+		
+		ImageButton downloadButton = (ImageButton) findViewById(R.id.downloadButton);
+		downloadButton.setEnabled(false);
+		
 		// 动作
 		lastButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
