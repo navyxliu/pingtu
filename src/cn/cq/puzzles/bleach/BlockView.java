@@ -168,7 +168,8 @@ public class BlockView extends View {
 		blocks = new int[imgsCounts];
 		// 初始化为非点击。
 		isEvent = false;
-
+	    Puzzles host = (Puzzles) getContext();
+	    host.disableDownloadButton();
 		// 初始化图块参数。保存图块正常序列
 		for (int i = 0; i < imgsCounts; i++) {
 			blocks[i] = i;
