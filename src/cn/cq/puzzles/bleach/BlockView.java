@@ -12,12 +12,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-// import org.loon.framework.game.helper.ImageHelper;
 
+import cn.cq.puzzles.bleach.Puzzles;
 public class BlockView extends View {
 
 	private static final int GRID_BG_COLOR = Color.argb(0xff, 0x0, 0x0, 0x0);
@@ -42,7 +41,7 @@ public class BlockView extends View {
 
 	private int  isSelected = 0;
         
-        private boolean isPreview;
+	private boolean isPreview;
 
 	private float _width;
 
@@ -66,8 +65,6 @@ public class BlockView extends View {
 
 	private Canvas screenCanvas = null;
 
-	private float rale;
-
 	private boolean running = false;
 
 	private boolean inited = false;
@@ -86,8 +83,8 @@ public class BlockView extends View {
 
 	private int c_drawable = R.drawable.backimage;
 
-	// add by cq
 	private int init_w;
+
 	private int init_h;
 
 	public BlockView(Context context, AttributeSet attrs) {
@@ -148,7 +145,8 @@ public class BlockView extends View {
 		_width = blockImage.getMinimumWidth();
 		// 获得实际窗体高。+
 		_height = blockImage.getMinimumHeight();
-		rale = Math.min(w / _width, h / _height);
+		
+		float rale = Math.min(w / _width, h / _height);
 		_width = (int) (_width * rale);
 		_height = (int) (_height * rale);
 
@@ -160,7 +158,6 @@ public class BlockView extends View {
 		blockHeight = (int) (_height / ROWS);
 
 		// 本程序直接使用backimage上一块图形区域缓冲选择项，所以实际背景图像高=图形高+额外图块高。
-
 		getBackImage(r.getDrawable(c_drawable));
 		getScreenImage();
 		getOverImage(r.getDrawable(R.drawable.over));
@@ -193,7 +190,6 @@ public class BlockView extends View {
 	}
 
 	private void getOverImage(Drawable src) {
-
 		Bitmap bitmap = Bitmap.createBitmap((int) _width, (int) _height,
 				Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas();
@@ -259,7 +255,7 @@ public class BlockView extends View {
 	protected void onDraw(Canvas canvas) {
 		int c = paint.getColor();
 		if (isPreview) {
-		    BitmapDrawable src = (BitmapDrawable) r.getDrawable(c_drawable);
+		    BitmapDrawable src = (BitmapDrawable) context.getResources().getDrawable(c_drawable);
 		    Bitmap bitmap = Bitmap.createBitmap((int) _width, (int) _height
 				+ blockHeight, Bitmap.Config.ARGB_8888);
 		    Canvas cvs = new Canvas();
@@ -319,7 +315,7 @@ public class BlockView extends View {
 		paint.setColor(c);
 		super.onDraw(canvas);
 	}
-
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (isSelected == 2 && event.getAction() == MotionEvent.ACTION_UP) {
@@ -333,6 +329,7 @@ public class BlockView extends View {
 		    blocks[last_y * COLS + last_x] = blocks[last_y2 * COLS + last_x2];
 		    blocks[last_y2 * COLS + last_x2] = t;
 
+		    // the subroutine to check isEvent
 		    int j1;
 		    for (j1 = 0; j1 < imgsCounts; j1++) {
 			    if (blocks[j1] != j1)
@@ -341,8 +338,10 @@ public class BlockView extends View {
 		    }
 		    if (j1 == imgsCounts) {
 			    isEvent = true;
+			    Puzzles host = (Puzzles) getContext();
+			    host.enableDownloadButton();
 		    }	
-
+		    
 		    mRedrawHandler.refresh();
 		    return true;
 		}
@@ -451,7 +450,6 @@ public class BlockView extends View {
 
 	// 这个Handler直接作用于UI主线程
 	class RefreshHandler extends Handler {
-
 		public void handleMessage(Message msg) {
 			BlockView.this.invalidate(); // 导致重绘
 			BlockView.this.update();

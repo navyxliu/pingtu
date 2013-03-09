@@ -1,5 +1,8 @@
 package cn.cq.puzzles.bleach;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
@@ -7,6 +10,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,17 +23,17 @@ import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import com.pad.android.iappad.AdController;
 import com.umeng.analytics.MobclickAgent;
 
 public class Puzzles extends Activity {
 	/** Called when the activity is first created. */
-
 	private BlockView draw = null;
 	private ArrayList<Integer> imgSourceIdlist = null;
-	int tag = 0;
-
+	private int tag = 0;
+	private String theme;
+	private ImageButton downloadBtn;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,16 +44,16 @@ public class Puzzles extends Activity {
 		// WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.main);
 		draw = (BlockView) findViewById(R.id.draw);
-
-		// 操作按钮，上一个，下一个
+		theme = getResources().getString(R.string.app_theme);
+		
 		final ImageButton lastButton = (ImageButton) findViewById(R.id.lastButton);
 		final ImageButton previewButton = (ImageButton) findViewById(R.id.previewButton);
 		final ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
 		
-		ImageButton downloadButton = (ImageButton) findViewById(R.id.downloadButton);
-		downloadButton.setEnabled(false);
+		// download button is initially disabled. enable if the puzzle is solved. 
+		downloadBtn = (ImageButton) findViewById(R.id.downloadButton);
+		this.disableDownloadButton();
 		
-		// 动作
 		lastButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				showLastPic(draw);
@@ -56,20 +62,25 @@ public class Puzzles extends Activity {
 
 		previewButton.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent ev) {
-                                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                                    draw.preview();     
-                                }
-                                else if (ev.getAction() == MotionEvent.ACTION_UP) {
-                                    draw.reset();     
-                                }
-
-                                return true; 
+				if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+					draw.preview();     
+                }
+                else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                    draw.reset();     
+                }
+                return true; 
 			}
 		});
 
 		nextButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				showNextPic(draw);
+			}
+		});
+
+		downloadBtn.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				saveSelectImage();
 			}
 		});
 
@@ -165,5 +176,54 @@ public class Puzzles extends Activity {
 							}
 						}).show();
 
+	}
+	
+	private void showHint(String hint) {
+		Toast.makeText(this, hint, Toast.LENGTH_SHORT).show();
+	}
+	
+	private Bitmap getSelectedBitmap() {
+		int id = imgSourceIdlist.get(tag);
+		BitmapDrawable bm = (BitmapDrawable) this.getResources().getDrawable(id);
+		return bm.getBitmap();
+	}
+	
+	// ensure we have writing external storage permission. edit Manifiest.xml to add  
+	private boolean saveSelectImage() {
+		String path = "/mnt/sdcard/" + theme + "_puzzle";
+		File d = new File(path);
+
+		if (!d.exists()) {
+			d.mkdirs();
+		}
+
+		// write to file
+		try {
+			path = path + File.separator + theme + "_" + tag + ".jpg";
+			File f = new File(path);
+			if (!f.exists()) {
+				f.createNewFile();
+
+				FileOutputStream fos = new FileOutputStream(f);
+				this.getSelectedBitmap().compress(CompressFormat.JPEG, 100, fos);
+			fos.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			this.showHint("ERROR: Image saving failed!");
+
+			return false;
+		}
+
+		showHint("Image saving succeed: " + path);
+		return true;
+	}
+	
+	public void enableDownloadButton() {
+		downloadBtn.setEnabled(true);
+	}
+	
+	public void disableDownloadButton() {
+		downloadBtn.setEnabled(false);
 	}
 }
